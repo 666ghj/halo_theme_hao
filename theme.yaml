@@ -1,0 +1,55 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: theme-hao
+  annotations:
+    # Add supports for Halo App Store
+    # https://halo.run/store/apps/app-MgZJX
+    "store.halo.run/app-id": "app-MgZJX"
+spec:
+  displayName: Hao
+  author:
+    name: 程序员小郭
+    website: https://liuzhihang.com
+  customTemplates:
+    page:
+      - name: 友情链接页面模版
+        description: 支持可预设文本的友链
+        screenshot:
+        file: page_links.html
+      - name: 关于页面模版
+        description: 关于页面
+        screenshot:
+        file: about.html
+      - name: 鱼塘页面模版
+        description: 友链鱼塘
+        screenshot:
+        file: fcircle.html
+      - name: 音乐页面模版
+        description: 音乐页面
+        screenshot:
+        file: music.html
+      - name: 留言板页面模版
+        description: 留言板页面
+        screenshot:
+        file: comments.html
+      - name: 待办清单页面模版
+        description: 待办清单页面
+        screenshot:
+        file: todolist.html
+      - name: 相册页面模版
+        description: 相册页面
+        screenshot:
+        file: album.html
+      - name: 最近评论页面模版
+        description: 最近评论页面
+        screenshot:
+        file: new_comment.html
+  description: Halo 2.x Theme base on Thymeleaf, Referring to Butterfly and Heo
+  logo: /themes/theme-hao/assets/images/hao-logo.jpg
+  website: http://lovexl.top
+  repo: 暂不开源
+  settingName: "theme-hao-setting"
+  configMapName: "theme-hao-configMap"
+  version: "1.4.9-小郭自用版"
+  require: ">=2.10.0"

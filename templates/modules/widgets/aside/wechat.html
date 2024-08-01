@@ -1,0 +1,35 @@
+<div class="card-widget heo-right-widget" id="card-wechat"
+th:with="faceImg = ${theme.config.sidebar.wechat.wechatImgFace}, backImg=${theme.config.sidebar.wechat.wechatImgBack}"
+     th:attr="onclick='javascript:window.open(\''+ ${theme.config.sidebar.wechat.url} +'\')'">
+    <div id="flip-wrapper">
+        <div id="flip-content">
+            <div class="face"
+                 th:style="'background: url('+ @{${#strings.isEmpty(faceImg) ?  assets_link + '/images/wechat/wechat1.png' : faceImg }} +') center center / 100% no-repeat;'"></div>
+            <div class="back face"
+                 th:style="'background: url('+ @{${#strings.isEmpty(backImg) ?  assets_link + '/images/wechat/wechat2.png' : backImg }} +') center center / 100% no-repeat;'"></div>
+        </div>
+    </div>
+
+    <style>
+        #aside-content .card-widget#card-wechat {
+            background: [(${theme.config.sidebar.wechat.color})];
+        }
+        #aside-content .card-widget#card-wechat::before {
+            position: absolute;
+            width: 100%;
+            height: 90%;
+            left: 0;
+            top: 0;
+            background: url([[${theme.config.sidebar.wechat.wechatImg}]]) center center no-repeat;
+            content: '';
+            background-size: cover;
+            transition: .2s cubic-bezier(.45,.04,.43,1.21)
+        }
+        #aside-content .card-widget#card-wechat:hover:before {
+            top: 100%;
+            opacity: 0;
+            transition: .3s ease-out
+        }
+
+    </style>
+</div>

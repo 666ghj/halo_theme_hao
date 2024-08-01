@@ -1,0 +1,184 @@
+<!-- 公共的 head 部分，可以定义部分 links,scripts,styles -->
+<th:block th:fragment="head(htmlType)">
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="var(--heo-card-bg)" name="theme-color">
+    <title th:text="${siteTitle}"></title>
+    <link rel="shortcut icon"
+          th:href="@{${#strings.isEmpty(site.favicon) ? assets_link + '/images/hao-logo.jpg' : site.favicon}}"/>
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/3.6.0/jquery.min.js"></script>
+
+    <script th:src="${assets_link + '/js/heo.js' + theme_version}"></script>
+
+    <link rel="stylesheet" th:href="${assets_link + '/zhheo/zhheoblog.css' + theme_version}">
+
+    <link rel="stylesheet" th:href="${assets_link + '/zhheo/custom.css' + theme_version}">
+
+    <link rel="stylesheet" th:href="${assets_link + '/zhheo/commentBarrage.css'}">
+
+    <style th:if="${theme.config.other.scrollbarLinearGradientEnable}">
+        *::-webkit-scrollbar-thumb {
+            background-color: var(--heo-main);
+            background-image: -webkit-linear-gradient(45deg,rgba(255,255,255,.4) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.4) 50%,rgba(255,255,255,.4) 75%,transparent 75%,transparent);
+            border-radius: 2em
+        }
+    </style>
+
+    <!-- swiper 在瞬间滚动时会使用 -->
+    <link th:if="${theme.config.top.moment}" rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/Swiper/8.0.6/swiper-bundle.min.css"/>
+
+    <!-- 右下角通知 -->
+    <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/node-snackbar/0.1.16/snackbar.min.css"
+          media="print"
+          onload='this.media="all"'
+          rel="stylesheet"
+    />
+
+    <!-- 代码块自动识别语言 -->
+    <th:block th:replace="~{modules/common/code}"/>
+    <!--  代码块-->
+    <th:block th:replace="~{macro/prism-code}"/>
+
+    <!-- 页脚内容-样式一 -->
+    <th:block th:replace="~{modules/common/footer-style-one}"/>
+
+    <script>
+        (win => {
+            win.saveToLocal = {
+                set: function setWithExpiry(key, value, ttl) {
+                    if (ttl === 0) return
+                    const now = new Date()
+                    const expiryDay = ttl * 86400000
+                    const item = {
+                        value: value,
+                        expiry: now.getTime() + expiryDay,
+                    }
+                    localStorage.setItem(key, JSON.stringify(item))
+                },
+
+                get: function getWithExpiry(key) {
+                    const itemStr = localStorage.getItem(key)
+
+                    if (!itemStr) {
+                        return undefined
+                    }
+                    const item = JSON.parse(itemStr)
+                    const now = new Date()
+
+                    if (now.getTime() > item.expiry) {
+                        localStorage.removeItem(key)
+                        return undefined
+                    }
+                    return item.value
+                }
+            }
+
+            win.getScript = url => new Promise((resolve, reject) => {
+                const script = document.createElement('script')
+                script.src = url
+                script.async = true
+                script.onerror = reject
+                script.onload = script.onreadystatechange = function () {
+                    const loadState = this.readyState
+                    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                    script.onload = script.onreadystatechange = null
+                    resolve()
+                }
+                document.head.appendChild(script)
+            })
+
+            win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+                const link = document.createElement('link')
+                link.rel = 'stylesheet'
+                link.href = url
+                if (id) link.id = id
+                link.onerror = reject
+                link.onload = link.onreadystatechange = function() {
+                    const loadState = this.readyState
+                    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                    link.onload = link.onreadystatechange = null
+                    resolve()
+                }
+                document.head.appendChild(link)
+            })
+
+            win.activateDarkMode = function () {
+                document.documentElement.setAttribute('data-theme', 'dark')
+                document.documentElement.classList.add('color-scheme-dark')
+                heo.initThemeColor()
+            }
+            win.activateLightMode = function () {
+                document.documentElement.setAttribute('data-theme', 'light')
+                document.documentElement.classList.remove('color-scheme-dark')
+                heo.initThemeColor()
+            }
+            const t = saveToLocal.get('theme')
+
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+            const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+            const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+            const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+            if (t === undefined) {
+                if (isLightMode) activateLightMode()
+                else if (isDarkMode) activateDarkMode()
+                else if (isNotSpecified || hasNoSupport) {
+                    const now = new Date()
+                    const hour = now.getHours()
+                    const isNight = hour <= 6 || hour >= 18
+                    isNight ? activateDarkMode() : activateLightMode()
+                }
+                window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+                    if (saveToLocal.get('theme') === undefined) {
+                        e.matches ? activateDarkMode() : activateLightMode()
+                    }
+                })
+            } else if (t === 'light') activateLightMode()
+            else activateDarkMode()
+
+            if("[[${theme.config.style.colorScheme}]]" === 'dark')
+                activateDarkMode()
+            if("[[${theme.config.style.colorScheme}]]" === 'light')
+                activateLightMode()
+
+            const asideStatus = saveToLocal.get('aside-status')
+            if (asideStatus !== undefined) {
+                if (asideStatus === 'hide') {
+                    document.documentElement.classList.add('hide-aside')
+                } else {
+                    document.documentElement.classList.remove('hide-aside')
+                }
+            }
+        })(window)
+    </script>
+
+    <!-- 动态加载条 -->
+    <script data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"
+            th:src="${assets_link + '/libs/pace/pace.min.js'}"
+            th:if="${theme.config.other.loadingBoxs.loadProgressBar}">
+    </script>
+
+    <!-- 复制 https://githubfast.com/zenorocha/clipboard.js -->
+    <script th:src="${assets_link + '/libs/clipboard/clipboard.min.js'}"></script>
+
+    <!-- 关于统计-->
+    <script th:if="${#strings.contains(theme.config.about.widgetList,'statistics-map')}" th:src="${assets_link + '/libs/countup/countup.js'}"></script>
+
+    <!-- 小板报 -->
+    <th:block th:if="${not #strings.isEmpty(theme.config.sidebar.welcome.key)}">
+        <script defer th:if="${#strings.contains(theme.config.sidebar.widgetss.indexWidgets,'welcome') ||
+            #strings.contains(theme.config.sidebar.widgetss.postWidgets,'welcome') ||
+            #strings.contains(theme.config.sidebar.widgetss.tagWidgets,'welcome') ||
+            #strings.contains(theme.config.sidebar.widgetss.categoryWidgets,'welcome')}"
+                th:src="${assets_link + '/libs/welcome/welcome.js'}"></script>
+    </th:block>
+
+    <!-- icon图标 -->
+    <link rel="stylesheet" th:href="${assets_link + '/icon/iconfont.css' + theme_version}">
+
+    <th:block th:replace="~{modules/variables/site-config}" />
+
+
+</th:block>

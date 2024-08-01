@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content}, htmlType = 'equipments',title = ${title + ' | ' + site.title}, head = ~{::head},_title = ${title})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = ${_title},
+                _permalink = '/equipments',
+                _cover = ${theme.config.other.opengraph.image},
+                _excerpt = ${site.seo.description},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+
+        <!-- 头部导航栏 -->
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = ${_title})}"></nav>
+        </header>
+        <main class="layout hide-aside" id="content-inner">
+            <div id="page">
+                <div  th:replace="~{macro/author-content :: author-content(background = ${theme.config.equipment.backgroundImg},
+                        smallTitle = ${theme.config.equipment.smallTitle},
+                        bigTitle = ${theme.config.equipment.bigTitle},
+                        detail = ${theme.config.equipment.detail},
+                        buttonUrl = '',
+                        buttonTitle = '')}" ></div>
+                <div id="equipment" th:if="${not #lists.isEmpty(groups)}">
+                    <th:block th:each="group : ${groups}">
+                        <div class="equipment-item">
+                            <h2 class="equipment-item-title">[[${group.spec.displayName}]]</h2>
+                            <div class="equipment-item-description">[[${#annotations.get(group, 'description')}]]</div>
+                            <div class="equipment-item-content" th:with="equipmentList = ${group.equipments}">
+
+                                <div class="equipment-item-content-item" th:each="equipment : ${equipmentList}">
+                                    <div class="equipment-item-content-item-cover">
+                                        <img class="equipment-item-content-item-image"
+                                             th:alt="${equipment.spec.displayName}"
+                                             th:src="${isLazyload ? loadingImg : equipment.spec.url}"
+                                             th:data-lazy-src="${ isLazyload ? equipment.spec.url : ''}">
+                                    </div>
+                                    <div class="equipment-item-content-item-info">
+                                        <div class="equipment-item-content-item-name"
+                                             th:onclick="rm.rightmenuCopyText([[${equipment.spec.displayName}]]);btf.snackbarShow('已复制装备名称');">
+                                            [[${equipment.spec.displayName}]]
+                                        </div>
+                                        <div class="equipment-item-content-item-specification">[[${#annotations.get(equipment, 'model')}]]
+                                        </div>
+                                        <div class="equipment-item-content-item-description">
+                                            [[${equipment.spec.description}]]
+                                        </div>
+                                        <div class="equipment-item-content-item-toolbar">
+                                            <a class="equipment-item-content-item-link" th:href="${#annotations.get(equipment, 'link')}"
+                                               target="_blank">[[${#annotations.get(equipment, 'button')}]]</a>
+                                            <a class="bber-reply"
+                                               th:onclick="rightMenuCommentText([['&quot;'+${equipment.spec.displayName}+' '+${#annotations.get(equipment, 'model')}+' '+${equipment.spec.description}+'&quot;']]);"
+                                               data-pjax-state="">
+                                                <i class="haofont hao-icon-chat--fill" style="font-size: 22px;"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+                <style>
+                    /* 我的装备 */
+                    .equipment-item-content {
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        margin: 0 -8px;
+                    }
+
+                    .equipment-item-content-item {
+                        width: calc(25% - 12px);
+                        border-radius: 12px;
+                        border: var(--style-border-always);
+                        overflow: hidden;
+                        margin: 8px 6px;
+                        background: var(--heo-card-bg);
+                        box-shadow: var(--heo-shadow-border);
+                        min-height: 400px;
+                        position: relative;
+                    }
+
+                    @media screen and (max-width: 1200px) {
+                        .equipment-item-content-item {
+                            width: calc(50% - 12px);
+                        }
+                    }
+
+                    @media screen and (max-width: 768px) {
+                        .equipment-item-content-item {
+                            width: 100%;
+                        }
+                    }
+
+                    .equipment-item-content-item-info {
+                        padding: 8px 16px 16px 16px;
+                        margin-top: 12px;
+                    }
+
+                    .equipment-item-content-item-name {
+                        font-size: 18px;
+                        font-weight: bold;
+                        line-height: 1;
+                        margin-bottom: 8px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        cursor: pointer;
+                        width: fit-content;
+                    }
+
+                    .equipment-item-content-item-name:hover {
+                        color: var(--heo-main);
+                    }
+
+                    .equipment-item-content-item-specification {
+                        font-size: 12px;
+                        color: var(--heo-secondtext);
+                        line-height: 1;
+                        margin-bottom: 12px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .equipment-item-content-item-description {
+                        line-height: 20px;
+                        color: var(--heo-secondtext);
+                        height: 60px;
+                        display: -webkit-box;
+                        overflow: hidden;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        font-size: 14px;
+                    }
+
+                    a.equipment-item-content-item-link {
+                        font-size: 12px;
+                        background: var(--heo-gray-op);
+                        padding: 4px 8px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    }
+
+                    a.equipment-item-content-item-link:hover {
+                        background: var(--heo-main);
+                        color: var(--heo-white);
+                    }
+
+                    h2.equipment-item-title {
+                        line-height: 1;
+                    }
+
+                    .equipment-item-description {
+                        line-height: 1;
+                        margin: 4px 0 8px 0;
+                        color: var(--heo-secondtext);
+                    }
+
+                    .equipment-item-content-item-cover {
+                        width: 100%;
+                        height: 200px;
+                        background: var(--heo-secondbg);
+                        display: flex;
+                        justify-content: center;
+                    }
+
+                    img.equipment-item-content-item-image {
+                        object-fit: cover;
+                        height: 100%;
+                    }
+
+                    div#equipment {
+                        margin-top: 26px;
+                    }
+
+                    .equipment-item-content-item-toolbar {
+                        display: flex;
+                        justify-content: space-between;
+                        position: absolute;
+                        bottom: 12px;
+                        left: 0;
+                        width: 100%;
+                        padding: 0 16px;
+                    }
+
+                    a.bber-reply {
+                        cursor: pointer;
+                    }
+                </style>
+                <!--/* 评论组件 */-->
+                <th:block
+                        th:replace="~{modules/comment :: comment(group = 'content.halo.run',
+                  kind = 'SinglePage',
+                  name = 'equipment',
+                  allowComment = true)}"/>
+            </div>
+
+        </main>
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+        <!-- 卡片顶部气泡效果 -->
+        <script th:if="${theme.config.other.bubbleEnable}" async data-pjax
+                th:src="${assets_link + '/libs/canvas/bubble.js'}"></script>
+    </div>
+
+</th:block>
+
+</html>

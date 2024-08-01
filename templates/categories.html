@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content}, htmlType = 'category',title = ${'分类' + ' | ' + site.title}, head = ~{::head})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = '分类目录',
+                _permalink = '/categories',
+                _cover = ${theme.config.other.opengraph.image},
+                _excerpt = ${site.seo.description},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = '分类')}"></nav>
+        </header>
+        <main class="layout hide-aside" id="content-inner">
+
+            <div id="page">
+                <h1 class="page-title" style="display: inline;">分类</h1>
+                <div th:if="${#strings.equals(theme.config.categories.use, 'default')}" class="category-lists">
+                    <div class="category-title is-center">分类 - <span class="category-amount">11</span></div>
+                    <div class="tag-cloud-list is-center">
+                        <a style="font-size: 1em;" th:each="categoryItem : ${categoryFinder.listAll()}"
+                           th:href="@{${categoryItem.status.permalink}}" th:id="${categoryItem.spec.displayName}">
+                            <span style="font-size: 22px;"
+                                  class="tags-punctuation">[[${categoryItem.spec.displayName}]]</span>
+
+                            <span class="tagsPageCount">[[${categoryItem.status.visiblePostCount}]]</span></a>
+                    </div>
+                </div>
+                <th:block th:if="${#strings.equals(theme.config.categories.use, '3D')}">
+                    <link rel="stylesheet" th:href="${assets_link + '/libs/no3d/no3d.css'}">
+                    <div id="libCategories" >
+                        <div id="lib-cards" class="container" >
+                            <a th:each="categoryItem : ${categoryFinder.listAll()}" th:href="@{${categoryItem.status.permalink}}" th:id="${categoryItem.spec.displayName}">
+                                <card th:data-image="${categoryItem.spec.cover}">
+                                    <h1 slot="header">[[${categoryItem.spec.displayName}]]</h1>
+                                    <p slot="content">[[${categoryItem.spec.description}]]</p>
+                                </card>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <script data-pjax src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.14/vue.min.js"></script>
+                        <script data-pjax th:src="${assets_link + '/libs/no3d/no3d.min.js'}"></script>
+                    </div>
+                </th:block>
+            </div>
+        </main>
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+    </div>
+
+</th:block>
+
+</html>

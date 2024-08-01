@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content}, htmlType = 'links',title = ${'友链' + ' | ' + site.title}, head = ~{::head})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = '友链',
+                _permalink = '/links',
+                _cover = ${theme.config.other.opengraph.image},
+                _excerpt = ${site.seo.description},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = '友链')}"></nav>
+            <link rel="stylesheet" type="text/css" th:href="${assets_link + '/libs/fcircle/heo-fcircle3.css'}">
+
+        </header>
+        <main class="layout hide-aside" id="content-inner">
+            <div id="page">
+                <th:block th:replace="~{macro/content-links :: content-links(${htmlType})}" />
+
+                <hr/>
+                <!--/* 评论组件 */-->
+                <th:block
+                        th:replace="~{modules/comment :: comment(group = 'content.halo.run',
+                  kind = 'SinglePage',
+                  name = 'links',
+                  allowComment = true)}"/>
+
+                <style>
+                    /*修复友链页面表情选择器无法显示完全的bug*/
+                    .tk-submit {
+                        overflow: inherit !important;
+                    }
+                </style>
+
+            </div>
+        </main>
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+    </div>
+
+</th:block>
+
+</html>

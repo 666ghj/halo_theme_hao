@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content}, htmlType = 'page',title = ${singlePage.spec.title + ' | ' + site.title}, head = ~{::head})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = ${singlePage.spec.title},
+                _permalink = ${singlePage.status.permalink},
+                _cover = ${singlePage.spec.cover},
+                _excerpt = ${singlePage.status.excerpt},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+
+        <!-- 头部导航栏 -->
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = ${singlePage.spec.title})}"></nav>
+        </header>
+        <main class="layout hide-aside" id="content-inner">
+            <div id="page">
+                <div  th:replace="~{macro/author-content :: author-content(background = ${singlePage.spec.cover},
+                        smallTitle = '想做清单',
+                        bigTitle = ${singlePage.spec.title},
+                        detail = ${singlePage.spec.excerpt.raw},
+                        buttonUrl = '',
+                        buttonTitle = '')}" ></div>
+                <div id="todolist-main" th:if="${not #lists.isEmpty(theme.config.todo.list)}"
+                     th:with="todoList = ${theme.config.todo.list}">
+
+
+                    <div id="todolist-left-container">
+                        <th:block th:each="todo : ${todoList}">
+                            <div id="todolist-left" th:if="${#strings.equals(todo.seat, 'left')}">
+                                <div class="todolist-item">
+                                    <h3 class="todolist-title">[[${todo.class_name}]]</h3>
+                                    <ul class="todolist-ul">
+                                        <th:block th:if="${not #lists.isEmpty(todo.todo_list)}"
+                                                  th:each="data : ${todo.todo_list}">
+                                            <li th:class="${data.completed ? 'achieve' : ''}">
+                                                <i style="font-size: 19px;margin-right: 5px;"
+                                                   th:class="${data.completed ? 'haofont  hao-icon-check-circle' : 'haofont hao-icon-yuan'}">
+                                                </i>[[${data.content}]]
+                                            </li>
+                                        </th:block>
+                                    </ul>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                    <div id="todolist-right-container">
+                        <th:block th:each="todo : ${todoList}">
+                            <div id="todolist-right" th:if="${#strings.equals(todo.seat, 'right')}">
+                                <div class="todolist-item">
+                                    <h3 class="todolist-title">[[${todo.class_name}]]</h3>
+                                    <ul>
+                                        <th:block th:if="${not #lists.isEmpty(todo.todo_list)}"
+                                                  th:each="data : ${todo.todo_list}">
+                                            <li th:class="${data.completed ? 'achieve' : ''}">
+                                                <i style="font-size: 19px;margin-right: 5px;"
+                                                   th:class="${data.completed ? 'haofont  hao-icon-check-circle' : 'haofont hao-icon-yuan'}">
+                                                </i>[[${data.content}]]
+                                            </li>
+                                        </th:block>
+                                    </ul>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+
+
+                </div>
+
+
+                <style>
+                    :root {
+                        --todo-border: 1px solid #f7a796;
+                    }
+
+                    [data-theme=dark] {
+                        --todo-border: 1px solid #51908b;
+                    }
+
+                    .todolist-item i.haofont {
+                        display: var(--fa-display,inline-block);
+                    }
+
+                    #todolist-main {
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        justify-content: space-between;
+                        margin: 16px 0 10px
+                    }
+
+                    #todolist-main li {
+                        list-style: none;
+                        font-size: 17px
+                    }
+
+                    #todolist-main ul {
+                        margin: 0;
+                        padding: 0
+                    }
+
+                    #todolist-left-container, #todolist-right-container {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: start;
+                        align-items: center;
+                        width: 50%;
+                    }
+
+                    #todolist-left {
+                        width: 100%;
+                        padding: 0 8px 0 0
+                    }
+
+                    #todolist-right {
+                        width: 100%;
+                        padding: 0 0 0 8px
+                    }
+
+                    .todolist-item {
+                        position: relative;
+                        background: #fae4df;
+                        border-radius: 12px;
+                        padding: 10px 1rem 1.2rem;
+                        border: 2px dashed #f7a796;
+                        margin-bottom: 1rem
+                    }
+
+                    @media screen and (max-width: 768px) {
+                        #todolist-left-container, #todolist-right-container {
+                            width: 100%;
+                        }
+
+                        #todolist-left, #todolist-right {
+                            padding: 0 0 0 0
+                        }
+                    }
+
+                    [data-theme=dark] .todolist-item {
+                        background: #242424;
+                        border: 2px dashed #51908b
+                    }
+
+
+                    h3.todolist-title {
+                        margin: 0 !important;
+                        border-bottom: var(--todo-border)
+                    }
+
+                    .todolist-item li {
+                        margin: 0 !important;
+                        border-bottom: var(--todo-border);
+                    }
+
+                    .todolist-item li::marker {
+                        content: none;
+                    }
+
+                    li.achieve {
+                        opacity: .8;
+                        text-decoration: line-through;
+                    }
+                </style>
+
+                <th:block
+                        th:replace="~{modules/comment :: comment(group = 'content.halo.run',
+                  kind = 'SinglePage',
+                  name = ${singlePage.metadata.name},
+                  allowComment = ${singlePage.spec.allowComment})}"/>
+            </div>
+
+
+        </main>
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+        <!-- 卡片顶部气泡效果 -->
+        <script th:if="${theme.config.other.bubbleEnable}" async data-pjax
+                th:src="${assets_link + '/libs/canvas/bubble.js'}"></script>
+    </div>
+
+</th:block>
+
+</html>

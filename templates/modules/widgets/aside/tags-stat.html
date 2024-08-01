@@ -1,0 +1,20 @@
+<!-- tag & stat 粘性布局 -->
+<div class="card-widget card-tags card-archives card-webinfo card-allinfo">
+
+
+        <span th:if="${theme.config.sidebar.tags_switch}">
+            <th:block th:replace="~{modules/widgets/aside/contain/tags-contain}" th:if="${theme.config.sidebar.tags_switch}"/>
+
+            <hr>
+        </span>
+
+    <span th:if="${theme.config.sidebar.archive_switch}">
+            <th:block th:replace="~{modules/widgets/aside/contain/archive-contain}" />
+
+            <hr>
+        </span>
+
+
+    <th:block th:replace="~{modules/widgets/aside/contain/stat-contain}" />
+
+</div>

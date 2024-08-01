@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content}, htmlType = 'comments',title = ${singlePage.spec.title + ' | ' + site.title}, head = ~{::head})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = ${singlePage.spec.title},
+                _permalink = ${singlePage.status.permalink},
+                _cover = ${singlePage.spec.cover},
+                _excerpt = ${singlePage.status.excerpt},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+
+        <!-- 头部导航栏 -->
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = ${singlePage.spec.title})}"></nav>
+        </header>
+
+        <main class="layout hide-aside" id="content-inner">
+            <div id="page">
+
+                <th:block th:if="${theme.config.envelope_comment.enable_envelope_comment}">
+                    <th:block th:if="${not #strings.isEmpty(theme.config.envelope_comment.title)}"
+                              th:utext="${theme.config.envelope_comment.title}">
+                    </th:block>
+                    <style>
+                        @media screen and (max-width: 600px) {
+
+                            #afterimg,
+                            #beforeimg {
+                                display: none !important
+                            }
+                        }
+
+                        @media screen and (min-width: 600px) {
+                            #article-container img {
+                                margin: 0 auto 0
+                            }
+
+                            #form-wrap {
+                                overflow: hidden;
+                                height: 447px;
+                                position: relative;
+                                top: 0;
+                                transition: all 1s ease-in-out .3s;
+                                z-index: 0
+                            }
+
+                            #form-wrap:hover {
+                                height: [[${theme.config.envelope_comment.height}]]px;
+                                top: -200px
+                            }
+
+                            #beforeimg {
+                                position: absolute;
+                                bottom: 126px;
+                                left: 0;
+                                background-repeat: no-repeat;
+                                width: 530px;
+                                height: 317px;
+                                z-index: -100;
+                                pointer-events: none
+                            }
+
+                            #afterimg {
+                                position: absolute;
+                                bottom: -2px;
+                                left: 0;
+                                background-repeat: no-repeat;
+                                width: 530px;
+                                height: 259px;
+                                z-index: 100;
+                                pointer-events: none
+                            }
+
+                            #envelope {
+                                position: relative;
+                                overflow: visible;
+                                width: 500px;
+                                margin: 0 auto;
+                                transition: all 1s ease-in-out .3s;
+                                padding-top: 200px
+                            }
+
+                            #maincontent {
+                                width: 530px;
+                                margin: 20px auto 0
+                            }
+
+                            .formmain {
+                                background: #fff;
+                                width: 95%;
+                                max-width: 800px;
+                                margin: auto auto;
+                                border-radius: 5px;
+                                border: 1px solid;
+                                overflow: hidden;
+                                -webkit-box-shadow: 0 0 20px 0 #000;
+                                box-shadow: 0 0 20px 0 #000
+                            }
+                        }
+
+                        [data-theme=dark] .formmain {
+                            background: #323232
+                        }
+
+                        [data-theme=dark] .comments {
+                            background: #5a5a5a !important
+                        }
+                    </style>
+
+
+                    <div id="article-container">
+                        <div id="maincontent">
+                            <div id="form-wrap">
+                                <img class="no-lightbox entered loaded" id="beforeimg"
+                                     th:src="@{${theme.config.envelope_comment.custom_pic.beforeimg}}">
+                                <div id="envelope">
+                                    <form>
+                                        <div class="formmain" style="pointer-events:none">
+                                            <img class="headerimg no-lightbox entered loaded"
+                                                 th:src="@{${theme.config.envelope_comment.custom_pic.cover}}"
+                                                 style="width:100%;overflow:hidden;pointer-events:none">
+                                            <div class="comments-main">
+                                                <h3 class="title3"
+                                                    style="text-decoration:none;color:var(--heo-theme);text-align:center">
+                                                    来自[[${site.title}]]的留言:</h3>
+                                                <div class="comments"
+                                                     style="text-align:center;border-bottom:#ddd 1px solid;border-left:#ddd 1px solid;padding-bottom:20px;background-color:#eee;margin:15px 0;padding-left:20px;padding-right:20px;border-top:#ddd 1px solid;border-right:#ddd 1px solid;padding-top:20px"
+                                                     th:with="message = ${theme.config.envelope_comment.messageList}">
+
+                                                    <div th:each="data : ${message}">[[${data.content}]]</div>
+
+                                                </div>
+                                                <div class="bottomcontent" style="text-align:center;margin-top:40px">
+                                                    <img class="bottomimg no-lightbox entered loaded"
+                                                         th:src="@{${theme.config.envelope_comment.custom_pic.line}}"
+                                                         style="width:100%;margin:5px auto 5px auto;display:block;pointer-events:none">
+                                                </div>
+                                                <p class="bottomhr" style="font-size:12px;text-align:center;color:#999">
+                                                    [[${theme.config.envelope_comment.bottom}]]</p>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <img id="afterimg" class="no-lightbox entered loaded"
+                                     th:src="@{${theme.config.envelope_comment.custom_pic.afterimg}}">
+                            </div>
+                        </div>
+                    </div>
+
+                </th:block>
+
+                <div class="flink" id="article-container">
+                    <th:block  th:utext="${singlePage.content.content}"></th:block>
+                </div>
+
+
+                <th:block th:if="${ theme.config.comments.commentsEnable &&
+                        #strings.contains('Twikoo,Artalk,Waline',theme.config.comments.use) &&
+                        theme.config.envelope_comment.enable_danmu }">
+                    <div id="danmuBtn">
+
+                    </div>
+                    <div id="danmu">
+                    </div>
+
+
+                    <style>
+                        .default-style a {
+                            color: #eee;
+                        }
+
+                        :root {
+                            --hao-purple: #4976f5;
+                        }
+
+                        #article-container a:not(.headerlink, .fancybox) {
+                            font-weight: 700;
+                            color: #4c4948;
+                            padding: 0 3px;
+                            border-bottom: 2px var(--hao-purple) solid;
+                        }
+
+                        #article-container a:not(.headerlink, .fancybox):hover {
+                            color: #fff;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            background-color: var(--hao-purple);
+                        }
+
+                        #danmu {
+                            width: 100%;
+                            height: calc(100% - 60px);
+                            position: fixed;
+                            left: 0;
+                            top: 60px;
+                            z-index: 1;
+                            pointer-events: none;
+                        }
+
+                        .hidedanmu {
+                            opacity: 0;
+                        }
+
+                        .hidedanmu * {
+                            pointer-events: none !important;
+                        }
+
+                        div#danmuBtn {
+                            display: flex;
+                            justify-content: center;
+                            margin: 20px;
+                        }
+
+                        div#danmuBtn button {
+                            background: var(--hao-purple);
+                            color: white;
+                            padding: 8px 20px;
+                            margin: 0 20px;
+                            border-radius: 100px;
+                        }
+
+                        .default-style {
+                            pointer-events: all;
+                            cursor: pointer;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 16px;
+                            border-radius: 100px;
+                            background-color: rgba(0, 0, 0, 0.5);
+                            padding: 6px 16px 6px 6px;
+                            color: #eee;
+                        }
+
+                        .default-style:hover {
+                            background-color: rgba(0, 0, 0, 0.7);
+                            transition: .3s
+                        }
+
+                        .default-style img {
+                            pointer-events: none;
+                            height: 30px;
+                            width: 30px;
+                            margin: 0 5px 0 0 !important;
+                            border-radius: 50%;
+                        }
+
+                        .default-style p {
+                            line-height: 1;
+                            pointer-events: none;
+                            margin: 0 !important;
+                            max-width: 300px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    </style>
+                </th:block>
+
+
+
+
+
+                <hr>
+                <!--/* 评论组件 */-->
+                <th:block th:replace="~{modules/comment :: comment(group = 'content.halo.run',
+                  kind = 'SinglePage',
+                  name = ${singlePage.metadata.name},
+                  allowComment = ${singlePage.spec.allowComment})}" />
+
+            </div>
+
+
+        </main>
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+    </div>
+
+</th:block>
+
+</html>

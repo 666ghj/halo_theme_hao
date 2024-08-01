@@ -1,0 +1,17 @@
+<!-- Steam卡片 -->
+<div >
+    <div class="item-headline-steam"><i class="fa-brands fa-steam"></i><span>Steam卡片</span></div>
+
+    <div class="card-widget card-steam"
+         th:attr="onclick='javascript:window.open(\''+ ${theme.config.sidebar.steam.steamUrl} +'\')'">
+        <div id="flip-wrapper-card">
+            <div id="flip-steam">
+                <div class="stimg"
+                     th:style="'background:url('+${theme.config.sidebar.steam.cardSteam}+') center center/100% no-repeat'">
+
+                </div>
+                <div class="back stimg" th:style="'background:url(' + assets_link + '/images/blank.webp) center center/100% no-repeat'"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content},htmlType = 'photos',title = ${title + ' | ' + site.title}, head = ~{::head},_title = ${title})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = ${_title},
+                _permalink = '/photos',
+                _cover = ${theme.config.other.opengraph.image},
+                _excerpt = ${site.seo.description},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+        <!-- 头部导航栏 -->
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = ${_title})}"></nav>
+        </header>
+        <main class="layout hide-aside" id="content-inner">
+            <div id="page">
+                <th:block th:if="${#strings.equals(theme.config.photos.photosStyle, 'default')}">
+                    <th:block th:each="group : ${photoFinder.groupBy()}">
+                        <th:block
+                                th:if="${#strings.equals(group.metadata.name, param.group) && not #strings.isEmpty(param.group)}"
+                                th:with="description = ${#annotations.get(group, 'description')},
+                         background = ${#annotations.get(group, 'background')}">
+                            <div class="author-content author-content-item essayPage single"
+                                 th:style="'background:url('+${background}+') left 28% / cover no-repeat !important;'">
+                                <div class="card-content">
+                                    <div class="author-content-item-tips">相册集</div>
+                                    <span class="author-content-item-title" th:text="${group.spec.displayName}"></span>
+                                    <div class="content-bottom">
+                                        <div class="tips" th:text="${description}"></div>
+                                    </div>
+                                    <div class="banner-button-group">
+                                        <a class="banner-button" target="_blank"
+                                           th:attr="onclick='pjax.loadUrl(\''+ ${theme.config.photos.topLink} +'\')'">
+                                            <i class="haofont hao-icon-circle-arrow-right"></i>
+                                            <span class="banner-button-text" th:text="返回"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </th:block>
+                    <th:block th:if="${#strings.isEmpty(param.group)}"
+                              th:with="background = ${theme.config.photos.backgroundImg}">
+                        <div class="author-content author-content-item essayPage single"
+                             th:style="'background:url('+${background}+') left 28% / cover no-repeat !important;'">
+                            <div class="card-content">
+                                <div class="author-content-item-tips">相册集</div>
+                                <span class="author-content-item-title">全部</span>
+                                <div class="content-bottom">
+                                    <div class="tips"></div>
+                                </div>
+                                <div class="banner-button-group">
+                                    <a class="banner-button" target="_blank"
+                                       th:attr="onclick='pjax.loadUrl(\''+ ${theme.config.photos.topLink} +'\')'">
+                                        <i class="haofont hao-icon-circle-arrow-right"></i>
+                                        <span class="banner-button-text" th:text="返回"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                    <div id="article-container">
+                        <section class="page-1 loadings">
+                            <div class="type-gallery ">
+                                <div class="gallery">
+                                    <div class="fj-gallery-item" th:each="photo : ${photos.items}">
+                                        <div th:if="${theme.config.photos.tagEnable}" class="tag-address">
+                                            [[${photo.spec.displayName}]]</div>
+                                        <img th:src="${photo.spec.url}" th:alt="${photo.spec.description}"
+                                             th:title="${photo.spec.description}">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <!-- 分页 -->
+                    <th:block th:with="param_group = ${not #strings.isEmpty(param.group) ? '?group='+param.group : ''}">
+                        <div th:replace="~{modules/widgets/page :: page('/photos',${photos},false,${param_group})}"></div>
+                    </th:block>
+                </th:block>
+
+                <div class="gallery-groups" th:if="${#strings.equals(theme.config.photos.photosStyle, 'one')}">
+                    <th:block th:each="group : ${photoFinder.groupBy()}">
+                        <h1 style="margin: 8px 0px 20px" th:if="${#strings.equals(group.metadata.name, param.group) && not #strings.isEmpty(param.group) }">
+                            [[${group.spec.displayName}]]
+                        </h1>
+                        <h1 style="margin: 8px 0px 20px" th:if="${#strings.isEmpty(param.group) }">
+                            全部
+                        </h1>
+                    </th:block>
+                    <div id="article-container">
+                        <section class="page-1 loadings">
+                            <div class="type-gallery ">
+                                <div class="gallery">
+                                    <div class="fj-gallery-item" th:each="photo : ${photos.items}">
+                                        <div th:if="${theme.config.photos.tagEnable}" class="tag-address">
+                                            [[${photo.spec.displayName}]]</div>
+                                        <img th:src="${photo.spec.url}" th:alt="${photo.spec.description}"
+                                             th:title="${photo.spec.description}">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <!-- 分页 -->
+                    <th:block th:with="param_group = ${not #strings.isEmpty(param.group) ? '?group='+param.group : ''}">
+                        <div th:replace="~{modules/widgets/page :: page('/photos',${photos},false,${param_group})}"></div>
+                    </th:block>
+                </div>
+
+                <style>
+                    .gallery-groups {
+                        box-shadow: var(--heo-shadow-border);
+                        padding: 1rem 2rem;
+                        border-radius: 12px;
+                        background: var(--heo-card-bg);
+                        border: var(--style-border);
+                        width: 100%;
+                        align-self: flex-start;
+                        animation: slide-in 0.6s 0.1s backwards;
+                    }
+
+                    #content-inner .loadings .type-gallery {
+                        opacity: 0
+                    }
+
+                    .loadings {
+                        height: 60px;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        color: #504e4e;
+                        border: none;
+                        background-size: auto 100%;
+                        box-shadow: none;
+                        background-color: inherit;
+                        background-image: none;
+                        background-image: url(/themes/theme-hao/assets/images/load/rotating-ball-o.svg)
+                    }
+
+                    #article-container .type-gallery {
+                        overflow: hidden;
+                        margin-top: 40px;
+                    }
+
+                    #content-inner .gallery {
+                        margin: 0 0 16px;
+                        text-align: center
+                    }
+
+                    #content-inner .gallery .fj-gallery {
+                        opacity: 0;
+                        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+                        filter: alpha(opacity=0)
+                    }
+
+                    #content-inner .gallery .fj-gallery .img-alt {
+                        display: none
+                    }
+
+                    #content-inner .gallery .fj-gallery.lazyload+button {
+                        display: inline-block
+                    }
+
+                    #content-inner .gallery .fj-gallery .gallery-data {
+                        opacity: 0;
+                        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+                        filter: alpha(opacity=0);
+                        visibility: hidden
+                    }
+
+                    #content-inner .gallery button {
+                        display: none;
+                        margin-top: 25px;
+                        padding: 10px;
+                        width: 9em;
+                        border-radius: 5px;
+                        background: var(--btn-bg);
+                        color: var(--btn-color);
+                        font-weight: 700;
+                        font-size: 1.1em;
+                        -webkit-transition: all .3s;
+                        -moz-transition: all .3s;
+                        -o-transition: all .3s;
+                        -ms-transition: all .3s;
+                        transition: all .3s
+                    }
+
+                    #content-inner .gallery button>* {
+                        -webkit-transition: all .4s;
+                        -moz-transition: all .4s;
+                        -o-transition: all .4s;
+                        -ms-transition: all .4s;
+                        transition: all .4s
+                    }
+
+                    #content-inner .gallery button i {
+                        opacity: 1;
+                        -ms-filter: none;
+                        filter: none;
+                        font-size: 1.1rem
+                    }
+
+                    #content-inner .gallery button:hover {
+                        background: var(--btn-hover-color)
+                    }
+
+                    #content-inner .gallery button:hover i {
+                        margin-left: 2px
+                    }
+
+                    #article-container .tag-address {
+                        display: flex;
+                        position: absolute;
+                        left: 8px;
+                        top: 8px;
+                        padding: 4px 6px;
+                        border-radius: 8px;
+                        background: var(--heo-black-op);
+                        font-size: 12px;
+                        color: var(--heo-white);
+                        transition: .3s;
+                        z-index: 1;
+                        user-select: none
+                    }
+
+                    img {
+                        border-style: none;
+                        border-radius: 8px;
+                        max-width: 100%;
+                        transition: all .2s ease 0s;
+                        -webkit-user-drag: none;
+                        -khtml-user-drag: none;
+                        -moz-user-drag: none;
+                        -ms-user-drag: none;
+                        user-drag: none
+                    }
+                </style>
+                <!--/* 评论组件 */-->
+                <th:block th:replace="~{modules/comment :: comment(group = 'content.halo.run',
+                  kind = 'SinglePage',
+                  name = 'photos',
+                  allowComment = true)}" />
+            </div>
+
+        </main>
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+        <!-- 卡片顶部气泡效果 -->
+        <script th:if="${theme.config.other.bubbleEnable}" async data-pjax
+                th:src="${assets_link + '/libs/canvas/bubble.js'}"></script>
+    </div>
+
+</th:block>
+
+</html>

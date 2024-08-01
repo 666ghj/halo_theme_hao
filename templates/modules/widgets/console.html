@@ -1,0 +1,137 @@
+<!-- TODO 控制台功能 -->
+<div id="console" >
+  <div class="close-btn" onclick="heo.hideConsole()" href="javascript:void(0);">
+    <i class="haofont hao-icon-circle-xmark"></i>
+  </div>
+  <div class="console-card-group">
+    <!-- 评论，需要使用评论插件，获取最近评论 -->
+    <div class="console-card-group-left">
+      <div class="console-card" id="card-newest-comments" onclick="heo.hideConsole()">
+        <div class="card-content">
+          <div class="author-content-item-tips">互动</div>
+          <span class="author-content-item-title">最近评论</span>
+        </div>
+        <div class="aside-list">
+          <th:block th:if="${#strings.equals(theme.config.comments.use, 'commentWidget') }">
+            <!-- BUG：由于当前的列出所有评论API无过滤功能，非文章页的评论无法查询到页面信息，所以非文章评论跳转至首页-->
+            <div class="aside-list-item" th:each="comment,iterStat : ${commentFinder.list(null, 1, 20)}"
+                 th:with="page = ${comment.spec.subjectRef.kind == 'Post' ? postFinder.getByName(comment.spec.subjectRef.name) :
+                  comment.spec.subjectRef.kind == 'SinglePage' && not #strings.contains('photos,links,moments', comment.spec.subjectRef.name) ? singlePageFinder.getByName(comment.spec.subjectRef.name) : null},
+                  url = ${page == null? '/' : page.status.permalink + '#comment-' + comment.metadata.name}"
+                 th:if="${iterStat.index  < 6}" >
+              <a th:href="${url}" class="thumbnail"  data-pjax-state="">
+                <img th:with="img = ${#strings.isEmpty(comment.owner.avatar)?'https://cravatar.cn/avatar/?d=mp':comment.owner.avatar}"
+                     th:src="${isLazyload ? loadingImg : img}"
+                     th:data-lazy-src="${ isLazyload ? img : ''}"
+                     th:alt="${comment.owner.displayName}">
+                <div class="name"><span>stonewu</span></div>
+              </a>
+              <div class="content">
+                <a class="comment" th:href="${url}" th:title="${comment.spec.content}" data-pjax-state="" th:text="${comment.spec.content}"></a>
+                <time th:datetime="${#dates.format(comment.metadata.creationTimestamp, 'yyyy-MM-dd HH:mm:ss')}"></time>
+              </div>
+            </div>
+            <script data-pjax>
+              window.addEventListener('load', () => {
+                $(".aside-list time").each(function () {
+                  var timeVal = $(this).attr("datetime");
+                  $(this).text(btf.diffDateExact(timeVal,true));
+                })
+              });
+            </script>
+          </th:block>
+          <span th:if="${#strings.equals(theme.config.comments.use, 'Twikoo') }">正在加载中...</span></div>
+      </div>
+    </div>
+    <!-- 右侧展示 tag -->
+    <div class="console-card-group-right">
+      <div class="console-card tags" onclick="heo.hideConsole()">
+        <div class="card-content">
+          <div class="author-content-item-tips">标签</div>
+          <span class="author-content-item-title">寻找感兴趣的领域</span>
+        </div>
+        <div class="card-tag-cloud" th:with="tags = ${tagFinder.listAll()}, tagQuantity = ${#conversions.convert(theme.config.sidebar.tagQuantity, 'java.lang.Integer')}">
+          <a style="font-size:1em;color:#d3d3d3"
+             th:each="tag,iterStat : ${tags}"
+             th:href="@{${tag.status.permalink}}"
+             th:if="${tagQuantity >= 0 && iterStat.index < tagQuantity || tagQuantity < 0}">
+            [[${tag.spec.displayName}]]<sup th:text="${tag.status.visiblePostCount}"></sup>
+          </a>
+        </div>
+      </div>
+      <!-- 底部展示时间归档 -->
+      <div class="console-card history" onclick="heo.hideConsole()">
+        <div class="item-headline"><i class="fas fa-archive"></i><span>文章</span></div>
+        <ul class="card-archive-list" th:with="archives = ${postFinder.archives(1,1000)}">
+          <th:block th:each="archive : ${archives.items}">
+            <li class="card-archive-list-item" th:each="month,monthStat : ${archive.months}">
+              <a class="card-archive-list-link" th:href="@{'/archives/'+${archive.year}+'/'+${month.month}}"
+                 data-pjax-state="load"><span
+                      class="card-archive-list-date">
+                  [[${(month.month=='01') ? '一月' :
+                            (month.month == '02') ? "二月"  :
+                            (month.month == '03') ? "三月" :
+                            (month.month == '04') ? "四月" :
+                            (month.month == '05') ? "五月" :
+                            (month.month == '06') ? "六月" :
+                            (month.month == '07') ? "七月" :
+                            (month.month == '08') ? "八月" :
+                            (month.month == '09') ? "九月" :
+                            (month.month == '10') ? "十月" :
+                            (month.month == '11') ? "十一月" :
+                                          "十二月"}]] [[${archive.year}]]
+                </span>
+                <div class="card-archive-list-count-group"><span
+                        class="card-archive-list-count">[[${month.posts.size()}]]</span>
+                  <span class="card-archive-list-count-unit">篇</span>
+                </div>
+              </a>
+            </li>
+          </th:block>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="console-card-group-reward" th:if="${theme.config.aboutReward.reward.enable_reward}">
+    <ul class="reward-all console-card">
+      <li class="reward-item"><a th:href="@{${theme.config.aboutReward.reward.wxPay}}"
+                                 rel="external nofollow noreferrer" target="_blank" draggable="false"><img
+              class=" entered loaded" alt="微信"
+              th:src="${theme.config.aboutReward.reward.wxPay}"></a>
+        <div class="post-qr-code-desc">微信</div>
+      </li>
+      <li class="reward-item"><a th:href="@{${theme.config.aboutReward.reward.alipay}}"
+                                 rel="external nofollow noreferrer" target="_blank" draggable="false"><img
+              class=" entered loaded" alt="支付宝"
+              th:src="${theme.config.aboutReward.reward.alipay}"></a>
+        <div class="post-qr-code-desc">支付宝</div>
+      </li>
+    </ul>
+  </div>
+  <div class="button-group">
+    <div class="console-btn-item">
+      <a class="darkmode_switchbutton" href="javascript:void(0);" onclick="navFn.switchDarkMode();" rel="external nofollow"
+         title="显示模式切换"><i class="haofont hao-icon-moon-clear-fill" style="font-size:1rem"></i>
+      </a>
+    </div>
+    <div class="console-btn-item" id="consoleHideAside" onclick="heo.hideAsideBtn()" title="边栏显示控制"><a
+            class="asideSwitch" data-pjax-state=""><i class="haofont hao-icon-arrows-left-right"></i></a></div>
+    <div class="console-btn-item on" id="consoleCommentBarrage" onclick="heo.switchCommentBarrage()" title="热评开关"><a
+            class="commentBarrage" data-pjax-state=""><i class="haofont hao-icon-chat--fill"></i></a></div>
+
+    <!--<div class="console-btn-item" id="consoleKeyboard" onclick="heo.keyboardToggle()" title="快捷键开关"><a-->
+    <!--        class="keyboard-switch"><i class="fa-duotone fa-keyboard"></i></a>-->
+    <!--</div>-->
+    <!--<div class="console-btn-item" id="assist-open" onclick="heo.hideConsole()" title="无障碍工具栏"><a-->
+    <!--        class="assist-btn"><i class="fa-duotone fa-wheelchair"></i></a>-->
+    <!--</div>-->
+    <div th:if="${theme.config.tool.nav_music.nav_musicEnable}" class="console-btn-item" id="consoleMusic" onclick="heo.musicToggle()" title="音乐开关">
+      <a class="music-switch" data-pjax-state="">
+        <i class="haofont hao-icon-disc-fill"></i>
+      </a>
+    </div>
+  </div>
+  <div class="console-mask" href="javascript:void(0);" onclick="heo.hideConsole()" rel="external nofollow">
+  </div>
+</div>

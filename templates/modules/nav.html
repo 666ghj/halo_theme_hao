@@ -1,0 +1,20 @@
+<nav class="show" id="nav" th:fragment="nav(title)">
+    <div id="nav-group">
+
+        <!-- 导航栏左侧 -->
+        <div th:replace="~{modules/widgets/nav-left}"/>
+        <div id="page-name-mask">
+            <div id="page-name" >
+                <a id="page-name-text" onclick="btf.scrollToDest(0,500)"
+                   th:text="${#strings.isEmpty(title) ? site.title : title}"></a>
+            </div>
+        </div>
+
+        <!-- 导航栏中间 -->
+        <div th:replace="~{modules/widgets/nav-menu :: nav-menu}"></div>
+
+        <!-- 导航栏右侧 -->
+        <div th:replace="~{modules/widgets/nav-right}"/>
+
+    </div>
+</nav>

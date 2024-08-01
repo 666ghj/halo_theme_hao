@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layouts/layout :: layout(content = ~{::content}, htmlType = 'tag',title = ${'标签' + ': ' + tag.spec.displayName + ' | ' + site.title}, head = ~{::head})}">
+<th:block th:fragment="head">
+    <th:block th:replace="~{modules/common/open-graph :: open-graph(_title = ${tag.spec.displayName},
+                _permalink = ${tag.status.permalink},
+                _cover = ${tag.spec.cover},
+                _excerpt = ${site.seo.description},
+                _type = 'website')}"></th:block>
+</th:block>
+<th:block th:fragment="content">
+
+    <div class="page" id="body-wrap">
+        <header class="not-top-img" id="page-header">
+            <nav th:replace="~{modules/nav :: nav(title = ${'标签'+ ': ' + tag.spec.displayName})}"></nav>
+        </header>
+        <main class="layout" id="content-inner">
+            <div id="tag">
+                <div id="tag-page-tags" th:with="tags = ${tagFinder.listAll()}">
+                    <a style="font-size:1em;color:#3c228c"
+                       th:classappend="${tag.metadata.name == tagItem.metadata.name} ? 'select'"
+                       th:each="tagItem : ${tags}"
+                       th:href="@{${tagItem.status.permalink}}"
+                       th:id="${tagItem.spec.slug}">
+                        <span class="tags-punctuation">[[${tagItem.spec.displayName}]]</span>
+                        <span class="tagsPageCount" th:text="${tagItem.status.visiblePostCount}"></span>
+                    </a>
+                </div>
+                <!-- 文章 -->
+                <th:block th:replace="~{macro/post-list :: post-list(${'/tags/'+tag.spec.slug})}" />
+            </div>
+            <!-- sidebar -->
+            <div th:replace="~{modules/aside :: aside(${theme.config.sidebar.widgetss.tagWidgets})}"></div>
+        </main>
+
+        <!-- 底部 -->
+        <footer th:replace="~{modules/footer}"/>
+    </div>
+
+</th:block>
+
+</html>
